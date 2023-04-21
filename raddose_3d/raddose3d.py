@@ -1,4 +1,5 @@
 import subprocess
+from os import path
 
 import pandas as pd
 import yaml
@@ -7,16 +8,19 @@ from raddose_3d.schemas.input import Beam, Crystal, RadDoseInput
 
 
 class RadDose3D:
-    def __init__(self, sample_id: str, energy: float) -> None:
-        self.energy = energy
+    def __init__(
+        self, sample_id: str, crystal: Crystal, beam: Beam, energy: float
+    ) -> None:
         self.sample_id = sample_id
+        self.crystal = crystal
+        self.beam = beam
+        self.energy = energy
+        self.raddose_3d_path = path.join(path.dirname(__file__), "raddose3d.jar")
 
     def _create_pydantic_model(self) -> RadDoseInput:
         rad_dose_input = RadDoseInput(
-            crystal=Crystal(
-                type="Cuboid", dimensions="100 80 60", coefcalc="exp", pdb="1KMT"
-            ),
-            beam=Beam(type="Gaussian", flux=3.8e12, FWHM="10 10"),
+            crystal=crystal,
+            beam=beam,
             energy=self.energy,
             collimation="Circular  30 30",
             wedge="0 360",
@@ -39,7 +43,7 @@ class RadDose3D:
             [
                 "java",
                 "-jar",
-                "raddose3d.jar",
+                self.raddose_3d_path,
                 "-i",
                 f"{self.sample_id}.txt",
                 "-p",
@@ -51,12 +55,18 @@ class RadDose3D:
         stdout, stderr = process.communicate()
         if len(stderr) != 0:
             print("Something has gone wrong!")
-            print(stderr)
+            raise RuntimeError(str(stderr))
 
         return pd.read_csv(f"{self.sample_id}-Summary.csv")
 
 
 if __name__ == "__main__":
-    rad_dose_3d = RadDose3D(sample_id="my_sample", energy=12.4)
+    crystal = Crystal(type="Cuboid", dimensions="100 80 60", coefcalc="exp", pdb="1KMT")
+    beam = Beam(type="Gaussian", flux=3.8e12, FWHM="10 10")
+
+    rad_dose_3d = RadDose3D(
+        sample_id="my_sample", crystal=crystal, beam=beam, energy=12.4
+    )
+
     summary = rad_dose_3d.run()
     print(summary)
