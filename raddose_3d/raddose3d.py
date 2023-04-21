@@ -80,9 +80,9 @@ class RadDose3D:
         stdout, stderr = process.communicate()
         if len(stderr) == 0:
             # Search files with .txt extension in source directory
-            patterns = ["/*.txt", "/*.csv", "/*.R"]
+            patterns = ["*.txt", "*.csv", "*.R"]
             for pattern in patterns:
-                files = glob.glob(path.dirname(__file__) + pattern)
+                files = glob.glob(path.join("./", pattern))
 
                 # move the files with txt extension
                 for file in files:
@@ -92,7 +92,6 @@ class RadDose3D:
                         file,
                         path.join(self.output_directory, self.sample_id, file_name),
                     )
-                    print("Moved:", file)
         else:
             print("Something has gone wrong!")
             raise RuntimeError(str(stderr))
