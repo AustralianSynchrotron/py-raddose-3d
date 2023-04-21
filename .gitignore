@@ -81,3 +81,8 @@ scratch.py
 
 # Virtual environments
 .venv/
+
+# Result files
+*.csv
+*.R
+*.txt
