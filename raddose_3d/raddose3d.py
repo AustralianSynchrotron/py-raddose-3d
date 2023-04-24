@@ -35,16 +35,16 @@ class RadDose3D:
 
     def _create_pydantic_model(self) -> RadDoseInput:
         rad_dose_input = RadDoseInput(
-            crystal=crystal,
-            beam=beam,
+            crystal=self.crystal,
+            beam=self.beam,
             wedge=self.wedge,
             exposuretime=self.exposure_time,
         )
         return rad_dose_input
 
-    def _create_input_txt_file(self):
+    def _create_input_txt_file(self) -> str:
         rad_dose_input = self._create_pydantic_model()
-        yaml_input = yaml.dump(rad_dose_input.dict(), sort_keys=False).splitlines()
+        yaml_input = yaml.dump(rad_dose_input.dict(exclude_none=True), sort_keys=False).splitlines()
 
         file_path = path.join(
             self.output_directory, self.sample_id, f"{self.sample_id}.txt"
@@ -88,7 +88,7 @@ class RadDose3D:
                     )
         else:
             print("Something has gone wrong!")
-            raise RuntimeError(str(stderr))
+            raise RuntimeError(stderr)
 
         results_directory = path.join(
             self.output_directory, self.sample_id, f"{self.sample_id}-Summary.csv"
@@ -99,14 +99,14 @@ class RadDose3D:
 
 if __name__ == "__main__":
     crystal = Crystal(type="Cuboid", dimensions="100 80 60", coefcalc="exp", pdb="1KMT")
-    beam = Beam(type="Gaussian", flux=3.8e12, FWHM="10 10", energy=12.4, collimation="Circular 30 30")
+    beam = Beam(type="Gaussian", flux=3.8e7, FWHM="10 10", energy=12.4, collimation="Circular 30 30")
 
     rad_dose_3d = RadDose3D(
         sample_id="my_sample",
         crystal=crystal,
         beam=beam,
         wedge="0.0 360.0",
-        exposure_time=360.0,
+        exposure_time=10.0,
     )
 
     summary = rad_dose_3d.run()
