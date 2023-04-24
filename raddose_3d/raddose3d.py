@@ -1,4 +1,5 @@
 import glob
+import logging
 import shutil
 import subprocess
 from os import mkdir, path
@@ -8,8 +9,18 @@ import yaml
 
 from raddose_3d.schemas.input import Beam, Crystal, RadDoseInput
 
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(asctime)s %(levelname)s: %(message)s",
+    datefmt="%d-%m-%Y %H:%M:%S",
+)
+
 
 class RadDose3D:
+    """
+    Python wrapper of RADDOSE-3D
+    """
+
     def __init__(
         self,
         sample_id: str,
@@ -19,6 +30,22 @@ class RadDose3D:
         exposure_time: float,
         output_directory="./",
     ) -> None:
+        """
+        Parameters
+        ----------
+        sample_id : str
+            Sample id
+        crystal : Crystal
+            A Crystal Pydantic model
+        beam : Beam
+            A Beam pydantic model
+        wedge : tuple[float, float]
+            Wedge in degrees, e.g. [0, 360]
+        exposure_time : float
+            Exposure time in seconds
+        output_directory : str, optional
+            Output directory, by default "./"
+        """
         self.sample_id = sample_id
         self.crystal = crystal
         self.beam = beam
@@ -34,6 +61,14 @@ class RadDose3D:
             pass
 
     def _create_pydantic_model(self) -> RadDoseInput:
+        """
+        Creates a RadDoseInput pydantic model
+
+        Returns
+        -------
+        RadDoseInput
+            The raddose input pydantic model
+        """
         rad_dose_input = RadDoseInput(
             crystal=self.crystal,
             beam=self.beam,
@@ -43,8 +78,19 @@ class RadDose3D:
         return rad_dose_input
 
     def _create_input_txt_file(self) -> str:
+        """
+        Writes a text file that RADDOSE-3D understands and returns
+        the path of the text file
+
+        Returns
+        -------
+        str
+            The path of the RADDOSE-3D input text file
+        """
         rad_dose_input = self._create_pydantic_model()
-        yaml_input = yaml.dump(rad_dose_input.dict(exclude_none=True), sort_keys=False).splitlines()
+        yaml_input = yaml.dump(
+            rad_dose_input.dict(exclude_none=True), sort_keys=False
+        ).splitlines()
 
         file_path = path.join(
             self.output_directory, self.sample_id, f"{self.sample_id}.txt"
@@ -55,7 +101,22 @@ class RadDose3D:
 
         return file_path
 
-    def run(self):
+    def run(self) -> pd.DataFrame:
+        """
+        Executes the raddose3d.jar file and returns a pandas dataframe
+        with the summary of the run. The resulting data generated from the
+        data are moved to self.output_directory.
+
+        Returns
+        -------
+        pd.DataFrame
+            A pandas DataFrame containing the summary of the run
+
+        Raises
+        ------
+        RuntimeError
+            An error if the run is not successful
+        """
         input_text_file_path = self._create_input_txt_file()
 
         process = subprocess.Popen(
@@ -73,21 +134,18 @@ class RadDose3D:
         )
         stdout, stderr = process.communicate()
         if len(stderr) == 0:
-            # Search files with .txt extension in source directory
+            # Move files to self.output_directory/self.sample_id
             patterns = ["*.txt", "*.csv", "*.R"]
             for pattern in patterns:
                 files = glob.glob(path.join("./", pattern))
-
-                # move the files with txt extension
                 for file in files:
-                    # extract file name form file path
                     file_name = path.basename(file)
                     shutil.move(
                         file,
                         path.join(self.output_directory, self.sample_id, file_name),
                     )
         else:
-            print("Something has gone wrong!")
+            logging.info("Something has gone wrong!")
             raise RuntimeError(stderr)
 
         results_directory = path.join(
@@ -95,19 +153,3 @@ class RadDose3D:
         )
 
         return pd.read_csv(results_directory)
-
-
-if __name__ == "__main__":
-    crystal = Crystal(type="Cuboid", dimensions="100 80 60", coefcalc="exp", pdb="1KMT")
-    beam = Beam(type="Gaussian", flux=3.8e7, FWHM="10 10", energy=12.4, collimation="Circular 30 30")
-
-    rad_dose_3d = RadDose3D(
-        sample_id="my_sample",
-        crystal=crystal,
-        beam=beam,
-        wedge="0.0 360.0",
-        exposure_time=10.0,
-    )
-
-    summary = rad_dose_3d.run()
-    print(summary)
