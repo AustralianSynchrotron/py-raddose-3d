@@ -12,12 +12,12 @@ class Beam(BaseModel):
     type: str
     flux: float
     FWHM: str
+    energy: float
+    collimation: str
 
 
 class RadDoseInput(BaseModel):
     crystal: Crystal
     beam: Beam
-    energy: float = Field(description="Energy in keV")
-    collimation: str
     wedge: str
     exposuretime: float

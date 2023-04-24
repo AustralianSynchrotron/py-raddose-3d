@@ -15,8 +15,6 @@ class RadDose3D:
         sample_id: str,
         crystal: Crystal,
         beam: Beam,
-        energy: float,
-        collimation: str,
         wedge: tuple[float, float],
         exposure_time: float,
         output_directory="./",
@@ -24,8 +22,6 @@ class RadDose3D:
         self.sample_id = sample_id
         self.crystal = crystal
         self.beam = beam
-        self.energy = energy
-        self.collimation = collimation
         self.wedge = wedge
         self.exposure_time = exposure_time
 
@@ -41,8 +37,6 @@ class RadDose3D:
         rad_dose_input = RadDoseInput(
             crystal=crystal,
             beam=beam,
-            energy=self.energy,
-            collimation=self.collimation,
             wedge=self.wedge,
             exposuretime=self.exposure_time,
         )
@@ -105,14 +99,12 @@ class RadDose3D:
 
 if __name__ == "__main__":
     crystal = Crystal(type="Cuboid", dimensions="100 80 60", coefcalc="exp", pdb="1KMT")
-    beam = Beam(type="Gaussian", flux=3.8e12, FWHM="10 10")
+    beam = Beam(type="Gaussian", flux=3.8e12, FWHM="10 10", energy=12.4, collimation="Circular 30 30")
 
     rad_dose_3d = RadDose3D(
         sample_id="my_sample",
         crystal=crystal,
         beam=beam,
-        energy=12.4,
-        collimation="Circular 30 30",
         wedge="0.0 360.0",
         exposure_time=360.0,
     )
