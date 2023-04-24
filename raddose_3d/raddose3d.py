@@ -2,7 +2,7 @@ import glob
 import logging
 import shutil
 import subprocess
-from os import mkdir, path
+from os import mkdir, path, getcwd
 
 import pandas as pd
 import yaml
@@ -28,7 +28,7 @@ class RadDose3D:
         beam: Beam,
         wedge: list[float, float],
         exposure_time: float,
-        output_directory="./",
+        output_directory: str | None = None,
     ) -> None:
         """
         Parameters
@@ -43,8 +43,8 @@ class RadDose3D:
             Wedge in degrees, e.g. [0, 360]
         exposure_time : float
             Exposure time in seconds
-        output_directory : str, optional
-            Output directory, by default "./"
+        output_directory : str | None, optional
+            Output directory, by default the current directory
         """
         self.sample_id = sample_id
         self.crystal = crystal
@@ -53,7 +53,8 @@ class RadDose3D:
         self.exposure_time = exposure_time
 
         self.raddose_3d_path = path.join(path.dirname(__file__), "raddose3d.jar")
-        self.output_directory = output_directory
+        if output_directory is None:
+            self.output_directory = getcwd()
 
         try:
             mkdir(path.join(self.output_directory, self.sample_id))
