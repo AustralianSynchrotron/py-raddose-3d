@@ -2,7 +2,7 @@ import glob
 import logging
 import shutil
 import subprocess
-from os import mkdir, path, getcwd
+from os import getcwd, mkdir, path
 
 import pandas as pd
 import yaml
@@ -138,7 +138,7 @@ class RadDose3D:
             # Move files to self.output_directory/self.sample_id
             patterns = ["*.txt", "*.csv", "*.R"]
             for pattern in patterns:
-                files = glob.glob(path.join("./", pattern))
+                files = glob.glob(path.join(self.output_directory, pattern))
                 for file in files:
                     file_name = path.basename(file)
                     shutil.move(
