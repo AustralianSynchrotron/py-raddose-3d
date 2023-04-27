@@ -26,7 +26,7 @@ class RadDose3D:
         sample_id: str,
         crystal: Crystal,
         beam: Beam,
-        wedge: list[float, float],
+        wedge: tuple[float, float],
         exposure_time: float,
         output_directory: str | None = None,
     ) -> None:
@@ -39,12 +39,13 @@ class RadDose3D:
             A Crystal Pydantic model
         beam : Beam
             A Beam pydantic model
-        wedge : list[float, float]
-            Wedge in degrees, e.g. [0, 360]
+        wedge : tuple[float, float]
+            Start and end rotational angle of the crystal in degrees, e.g. (0, 360)
         exposure_time : float
             Exposure time in seconds
         output_directory : str | None, optional
-            Output directory, by default the current directory
+            Output directory. If output_directory=None, we use the current working directory,
+            by default None.
         """
         self.sample_id = sample_id
         self.crystal = crystal

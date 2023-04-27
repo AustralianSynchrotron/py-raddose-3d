@@ -106,8 +106,8 @@ class Beam(BaseModel):
     File: str | None = Field(
         description="Tell RADDOSE-3D the name of the file", example="beam.pgm"
     )
-    PixelSize: str | None = Field(
-        description="Specify the pixel size in microns", example="0.3027 0.2995"
+    PixelSize: tuple[float, float] | str | None = Field(
+        description="Specify the pixel size in microns", example=(0.3027, 0.2995)
     )
 
     @validator("Collimation", each_item=True)
@@ -116,6 +116,10 @@ class Beam(BaseModel):
 
     @validator("FWHM", each_item=True)
     def convert_FWHM_to_str(cls, v):
+        return _convert_tuple_to_str(v)
+
+    @validator("PixelSize", each_item=True)
+    def convert_pixel_size_to_str(cls, v):
         return _convert_tuple_to_str(v)
 
 
