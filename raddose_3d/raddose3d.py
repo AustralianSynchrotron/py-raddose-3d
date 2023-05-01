@@ -1,6 +1,4 @@
-import glob
 import logging
-import shutil
 import subprocess
 from os import getcwd, mkdir, path
 
@@ -121,6 +119,11 @@ class RadDose3D:
         """
         input_text_file_path = self._create_input_txt_file()
 
+        prefix = path.join(
+            self.output_directory,
+            self.sample_id,
+            self.sample_id + "-",
+        )
         process = subprocess.Popen(
             [
                 "java",
@@ -129,24 +132,13 @@ class RadDose3D:
                 "-i",
                 input_text_file_path,
                 "-p",
-                self.sample_id + "-",
+                prefix,
             ],
             stdout=subprocess.PIPE,
             stderr=subprocess.PIPE,
         )
         stdout, stderr = process.communicate()
-        if len(stderr) == 0:
-            # Move files to self.output_directory/self.sample_id
-            patterns = ["*.txt", "*.csv", "*.R"]
-            for pattern in patterns:
-                files = glob.glob(path.join(self.output_directory, pattern))
-                for file in files:
-                    file_name = path.basename(file)
-                    shutil.move(
-                        file,
-                        path.join(self.output_directory, self.sample_id, file_name),
-                    )
-        else:
+        if len(stderr) != 0:
             logging.info("Something has gone wrong!")
             raise RuntimeError(stderr)
 
