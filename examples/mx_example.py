@@ -18,6 +18,7 @@ crystal = Crystal(
     ProteinHeavyAtoms=("Zn", 0.333, "S", 6),
     SolventHeavyConc=("P", 425),
     SolventFraction=0.64,
+    CalculateFLEscape=True,
 )
 
 beam = Beam(

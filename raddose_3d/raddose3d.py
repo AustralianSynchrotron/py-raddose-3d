@@ -50,11 +50,14 @@ class RadDose3D:
         self.raddose_3d_path = path.join(path.dirname(__file__), "raddose3d.jar")
         if output_directory is None:
             self.output_directory = getcwd()
+        else:
+            self.output_directory = output_directory
 
+        self.sample_directory = path.join(self.output_directory, self.sample_id)
         try:
-            mkdir(path.join(self.output_directory, self.sample_id))
+            mkdir(self.sample_directory)
         except FileExistsError:
-            pass
+            logging.info("Folder already exists, overwriting results")
 
     def _create_pydantic_model(self) -> RadDoseInput:
         """
@@ -87,9 +90,7 @@ class RadDose3D:
             rad_dose_input.dict(exclude_none=True), sort_keys=False
         ).splitlines()
 
-        file_path = path.join(
-            self.output_directory, self.sample_id, f"{self.sample_id}.txt"
-        )
+        file_path = path.join(self.sample_directory, f"{self.sample_id}.txt")
         with open(file_path, "w") as fp:
             for line in yaml_input:
                 # For some reason, wedge is not included as a header in the raddose-3d,
@@ -120,8 +121,7 @@ class RadDose3D:
         input_text_file_path = self._create_input_txt_file()
 
         prefix = path.join(
-            self.output_directory,
-            self.sample_id,
+            self.sample_directory,
             self.sample_id + "-",
         )
         process = subprocess.Popen(
@@ -138,12 +138,16 @@ class RadDose3D:
             stderr=subprocess.PIPE,
         )
         stdout, stderr = process.communicate()
+
         if len(stderr) != 0:
             logging.info("Something has gone wrong!")
-            raise RuntimeError(stderr)
+            raise RuntimeError(str(stderr, encoding="utf-8"))
+        else:
+            logging.info(str(stdout, encoding="utf-8"))
+            logging.info(f"Run successful. Results saved to {self.sample_directory}")
 
         results_directory = path.join(
-            self.output_directory, self.sample_id, f"{self.sample_id}-Summary.csv"
+            self.sample_directory, f"{self.sample_id}-Summary.csv"
         )
 
         return pd.read_csv(results_directory)

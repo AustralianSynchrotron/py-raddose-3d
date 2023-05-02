@@ -96,6 +96,56 @@ class Crystal(BaseModel):
     SimPhotons: int | None
     SurroundingThickness: tuple[float, float, float] | str | None
 
+    @validator("Type", each_item=True)
+    def validate_type(cls, v: str) -> str:
+        allowed_values = ["cuboid", "spherical", "cylinder", "polyhedron"]
+        if v.lower() not in allowed_values:
+            raise ValueError(
+                f"Error validating Crystal Type. Allowed values are {allowed_values}, not {v}"
+            )
+        return v
+
+    @validator("ContainerMaterialType", each_item=True)
+    def validate_ContainerMaterialType(cls, v: str) -> str:
+        allowed_values = ["none", "mixture", "elemental"]
+        if v.lower() not in allowed_values:
+            raise ValueError(
+                "Error validating ContainerMaterialType. Allowed values are "
+                f"{allowed_values}, not {v}"
+            )
+        return v
+
+    @validator("AbsCoefCalc", each_item=True)
+    def validate_AbsCoefCalc(cls, v: str) -> str:
+        allowed_values = [
+            "average",
+            "dummy",
+            "rd",
+            "rdv2",
+            "rdv3",
+            "rd3d",
+            "exp",
+            "sequence",
+            "saxs",
+            "saxsseq",
+            "smallmole",
+            "cif",
+        ]
+        if v.lower() not in allowed_values:
+            raise ValueError(
+                f"Error validating AbsCoefCalc. Allowed values are {allowed_values}, not {v}"
+            )
+        return v
+
+    @validator("Subprogram", each_item=True)
+    def validate_Subprogram(cls, v: str) -> str:
+        allowed_values = ["xfel", "montecarlo"]
+        if v.lower() not in allowed_values:
+            raise ValueError(
+                f"Error validating Subprogram. Allowed values are {allowed_values}, not {v}"
+            )
+        return v
+
     @validator("Dimensions", each_item=True)
     def convert_dimensions_to_str(cls, v):
         return _convert_tuple_to_str(v)
@@ -176,8 +226,22 @@ class Beam(BaseModel):
     )
     PulseEnergy: float | None
 
+    @validator("Type", each_item=True)
+    def validate_type(cls, v: str) -> str:
+        allowed_values = ["tophat", "gaussian", "experimentalpgm"]
+        if v.lower() not in allowed_values:
+            raise ValueError(
+                f"Error validating Beam Type. Allowed values are {allowed_values}, not {v}"
+            )
+        return v
+
     @validator("Collimation", each_item=True)
-    def convert_collimation_to_str(cls, v):
+    def convert_collimation_to_str(cls, v: tuple[str, float, float]):
+        allowed_values = ["rectangular", "circular"]
+        if v[0].lower() not in allowed_values:
+            raise ValueError(
+                f"Error validating Collimation. Allowed values are {allowed_values}, not {v[0]}"
+            )
         return _convert_tuple_to_str(v)
 
     @validator("FWHM", each_item=True)
