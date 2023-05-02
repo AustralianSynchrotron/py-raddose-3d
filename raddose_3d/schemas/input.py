@@ -29,7 +29,7 @@ class Crystal(BaseModel):
     Type: str = Field(example="Cuboid")
     WireframeType: str | None
     ModelFile: str | None
-    Dimensions: tuple[int, int, int] | str = Field(
+    Dimensions: tuple[int] | tuple[int, int] | tuple[int, int, int] | str = Field(
         description="Dimensions of the crystal in X,Y,Z in micrometers.",
         example=(100, 80, 60),
     )
