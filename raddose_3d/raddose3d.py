@@ -5,7 +5,7 @@ from os import getcwd, mkdir, path
 import pandas as pd
 import yaml
 
-from raddose_3d.schemas.input import Beam, Crystal, RadDoseInput
+from raddose_3d.schemas.input import Beam, Crystal, RadDoseInput, Wedge
 
 logging.basicConfig(
     level=logging.INFO,
@@ -24,8 +24,7 @@ class RadDose3D:
         sample_id: str,
         crystal: Crystal,
         beam: Beam,
-        wedge: tuple[float, float],
-        exposure_time: float,
+        wedge: Wedge,
         output_directory: str | None = None,
     ) -> None:
         """
@@ -37,10 +36,8 @@ class RadDose3D:
             A Crystal Pydantic model
         beam : Beam
             A Beam pydantic model
-        wedge : tuple[float, float]
-            Start and end rotational angle of the crystal in degrees, e.g. (0, 360)
-        exposure_time : float
-            Exposure time in seconds
+        wedge : Wedge
+            A Wedge pydantic model
         output_directory : str | None, optional
             Output directory. If output_directory=None, we use the current working directory,
             by default None.
@@ -49,7 +46,6 @@ class RadDose3D:
         self.crystal = crystal
         self.beam = beam
         self.wedge = wedge
-        self.exposure_time = exposure_time
 
         self.raddose_3d_path = path.join(path.dirname(__file__), "raddose3d.jar")
         if output_directory is None:
@@ -73,7 +69,6 @@ class RadDose3D:
             crystal=self.crystal,
             beam=self.beam,
             wedge=self.wedge,
-            exposuretime=self.exposure_time,
         )
         return rad_dose_input
 
@@ -88,7 +83,7 @@ class RadDose3D:
             The path of the RADDOSE-3D input text file
         """
         rad_dose_input = self._create_pydantic_model()
-        yaml_input = yaml.dump(
+        yaml_input: list[str] = yaml.dump(
             rad_dose_input.dict(exclude_none=True), sort_keys=False
         ).splitlines()
 
@@ -97,7 +92,12 @@ class RadDose3D:
         )
         with open(file_path, "w") as fp:
             for line in yaml_input:
-                fp.write(line.replace(":", "") + "\n")
+                # For some reason, wedge is not included as a header in the raddose-3d,
+                # input file, even though it is defined as a block in raddose-3D
+                if line.lower() != "wedge:":
+                    fp.write(line.replace(":", "") + "\n")
+                else:
+                    fp.write("# wedge" + "\n")
 
         return file_path
 

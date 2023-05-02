@@ -5,7 +5,7 @@ seconds with a 90 degrees rotation (example taken from the the main RADDOSE-3D r
 """
 
 from raddose_3d.raddose3d import RadDose3D
-from raddose_3d.schemas.input import Beam, Crystal
+from raddose_3d.schemas.input import Beam, Crystal, Wedge
 
 crystal = Crystal(
     Type="Cuboid",
@@ -28,12 +28,13 @@ beam = Beam(
     Collimation=("Rectangular", 100, 100),
 )
 
+wedge = Wedge(Wedge=(0.0, 90.0), ExposureTime=50.0)
+
 rad_dose_3d = RadDose3D(
     sample_id="my_sample",
     crystal=crystal,
     beam=beam,
-    wedge=(0.0, 90.0),
-    exposure_time=50.0,
+    wedge=wedge,
 )
 
 summary = rad_dose_3d.run()
