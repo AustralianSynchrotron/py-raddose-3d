@@ -83,6 +83,7 @@ class Crystal(BaseModel):
     )
     ProteinConc: float | None
     SmallMoleAtoms: tuple | None = Field(example=("C", 18, "H", 15, "Bi", 8))
+    CalculatePEescape: bool | None
     CalculateFLEscape: bool | None
     CalcSurrounding: bool | None
     SurroundingHeavyConc: tuple | str | None = Field(example=("Na", 1000, "Cl", 1000))
@@ -200,6 +201,9 @@ class Crystal(BaseModel):
     def convert_SurroundingThickness_to_str(cls, v):
         return _convert_tuple_to_str(v)
 
+    class Config:
+        extra = "forbid"
+
 
 class Beam(BaseModel):
     Type: str = Field(description="Beam type", example="Gaussian")
@@ -252,6 +256,9 @@ class Beam(BaseModel):
     def convert_pixel_size_to_str(cls, v):
         return _convert_tuple_to_str(v)
 
+    class Config:
+        extra = "forbid"
+
 
 class Wedge(BaseModel):
     Wedge: tuple[float, float] | str
@@ -278,3 +285,6 @@ class RadDoseInput(BaseModel):
     crystal: Crystal
     beam: Beam
     wedge: Wedge
+
+    class Config:
+        extra = "forbid"

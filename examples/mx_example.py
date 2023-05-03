@@ -19,6 +19,7 @@ crystal = Crystal(
     SolventHeavyConc=("P", 425),
     SolventFraction=0.64,
     CalculateFLEscape=True,
+    CalculatePEescape=True,
 )
 
 beam = Beam(
