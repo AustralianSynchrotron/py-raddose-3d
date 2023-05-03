@@ -1,3 +1,4 @@
+import asyncio
 import logging
 import subprocess
 from os import getcwd, mkdir, path
@@ -59,6 +60,13 @@ class RadDose3D:
         except FileExistsError:
             logging.info("Folder already exists, overwriting results")
 
+        self.prefix = path.join(
+            self.sample_directory,
+            self.sample_id + "-",
+        )
+
+        self.input_text_file_path = self._create_input_txt_file()
+
     def _create_pydantic_model(self) -> RadDoseInput:
         """
         Creates a RadDoseInput pydantic model
@@ -102,43 +110,26 @@ class RadDose3D:
 
         return file_path
 
-    def run(self) -> pd.DataFrame:
+    def print_stdout_and_stderr(self, stdout: bytes, stderr: bytes) -> None:
         """
-        Executes the raddose3d.jar file and returns a pandas dataframe
-        with the summary of the run. The resulting data generated from the
-        data are moved to self.output_directory.
+        Prints stdout and stderr
 
-        Returns
-        -------
-        pd.DataFrame
-            A pandas DataFrame containing the summary of the run
+        Parameters
+        ----------
+        stdout : bytes
+            stdout
+        stderr : bytes
+            stdout
 
         Raises
         ------
         RuntimeError
             An error if the run is not successful
+
+        Returns
+        -------
+        None
         """
-        input_text_file_path = self._create_input_txt_file()
-
-        prefix = path.join(
-            self.sample_directory,
-            self.sample_id + "-",
-        )
-        process = subprocess.Popen(
-            [
-                "java",
-                "-jar",
-                self.raddose_3d_path,
-                "-i",
-                input_text_file_path,
-                "-p",
-                prefix,
-            ],
-            stdout=subprocess.PIPE,
-            stderr=subprocess.PIPE,
-        )
-        stdout, stderr = process.communicate()
-
         if len(stderr) != 0:
             logging.info("Something has gone wrong!")
             raise RuntimeError(str(stderr, encoding="utf-8"))
@@ -146,8 +137,62 @@ class RadDose3D:
             logging.info(str(stdout, encoding="utf-8"))
             logging.info(f"Run successful. Results saved to {self.sample_directory}")
 
+    def run(self) -> pd.DataFrame:
+        """
+        Executes the raddose3d.jar file and returns a pandas DataFrame
+        with the summary of the run.
+
+        Returns
+        -------
+        pd.DataFrame
+            A pandas DataFrame containing the summary of the run
+        """
+        process = subprocess.Popen(
+            [
+                "java",
+                "-jar",
+                self.raddose_3d_path,
+                "-i",
+                self.input_text_file_path,
+                "-p",
+                self.prefix,
+            ],
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+        )
+        stdout, stderr = process.communicate()
+
+        self.print_stdout_and_stderr(stdout, stderr)
+
         results_directory = path.join(
             self.sample_directory, f"{self.sample_id}-Summary.csv"
         )
+        return pd.read_csv(results_directory)
 
+    async def run_async(self) -> pd.DataFrame:
+        """
+        Executes the raddose3d.jar file asynchronously and returns a pandas
+        DataFrame with the summary of the run.
+
+        Returns
+        -------
+        pd.DataFrame
+            A pandas DataFrame containing the summary of the run
+        """
+        cmd = (
+            f"java -jar {self.raddose_3d_path} -i {self.input_text_file_path} "
+            + f"-p {self.prefix}"
+        )
+
+        process = await asyncio.create_subprocess_shell(
+            cmd, stdout=asyncio.subprocess.PIPE, stderr=asyncio.subprocess.PIPE
+        )
+
+        stdout, stderr = await process.communicate()
+
+        self.print_stdout_and_stderr(stdout, stderr)
+
+        results_directory = path.join(
+            self.sample_directory, f"{self.sample_id}-Summary.csv"
+        )
         return pd.read_csv(results_directory)

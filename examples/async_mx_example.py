@@ -1,11 +1,6 @@
-"""
-This example shows how you can run RADDOSE-3D to simulate a macromolecular crystallography
-experiment where a crystal of insulin is exposed to a Gaussian profile X-ray beam for 50
-seconds with a 90 degrees rotation (example taken from the the main RADDOSE-3D repository)
-"""
-
 from raddose_3d.raddose3d import RadDose3D
 from raddose_3d.schemas.input import Beam, Crystal, Wedge
+import asyncio
 
 crystal = Crystal(
     Type="Cuboid",
@@ -30,12 +25,21 @@ beam = Beam(
 
 wedge = Wedge(Wedge=(0.0, 90.0), ExposureTime=50.0)
 
-rad_dose_3d = RadDose3D(
-    sample_id="my_sample",
+sample_1 = RadDose3D(
+    sample_id="sample_1",
     crystal=crystal,
     beam=beam,
     wedge=wedge,
 )
 
-summary = rad_dose_3d.run()
-print(summary)
+sample_2= RadDose3D(
+    sample_id="sample_2",
+    crystal=crystal,
+    beam=beam,
+    wedge=wedge,
+)
+
+async def main():
+    await asyncio.gather(sample_1.run_async(), sample_2.run_async())
+
+asyncio.run(main())
