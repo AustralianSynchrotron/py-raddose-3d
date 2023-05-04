@@ -1,6 +1,7 @@
 import asyncio
 import logging
 import subprocess
+import warnings
 from os import getcwd, mkdir, path
 
 import pandas as pd
@@ -134,8 +135,14 @@ class RadDose3D:
             logging.info("Something has gone wrong!")
             raise RuntimeError(str(stderr, encoding="utf-8"))
         else:
-            logging.info(str(stdout, encoding="utf-8"))
-            logging.info(f"Run successful. Results saved to {self.sample_directory}")
+            stdout_str = str(stdout, encoding="utf-8")
+            logging.info(stdout_str)
+
+            for line in stdout_str.splitlines():
+                if "warning" in line.lower():
+                    warnings.warn(line, RuntimeWarning)
+
+            logging.info(f"Results saved to {self.sample_directory}")
 
     def run(self) -> pd.DataFrame:
         """
