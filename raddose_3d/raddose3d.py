@@ -137,9 +137,10 @@ class RadDose3D:
         else:
             stdout_str = str(stdout, encoding="utf-8")
             logging.info(stdout_str)
+            warning_list = ["warning", "angular resolution too big"]
 
             for line in stdout_str.splitlines():
-                if "warning" in line.lower():
+                if any(word in line.lower() for word in warning_list):
                     warnings.warn(line, RuntimeWarning)
 
             logging.info(f"Results saved to {self.sample_directory}")
