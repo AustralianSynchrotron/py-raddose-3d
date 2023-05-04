@@ -1,4 +1,4 @@
-from pydantic import BaseModel, Field, validator
+from pydantic import BaseModel, Field, root_validator, validator
 
 
 def _convert_tuple_to_str(input: tuple) -> str:
@@ -97,14 +97,26 @@ class Crystal(BaseModel):
     SimPhotons: int | None
     SurroundingThickness: tuple[float, float, float] | str | None
 
-    @validator("Type", each_item=True)
-    def validate_type(cls, v: str) -> str:
-        allowed_values = ["cuboid", "spherical", "cylinder", "polyhedron"]
-        if v.lower() not in allowed_values:
+    @root_validator(pre=True)
+    def validate_type(cls, values: dict) -> dict:
+        allowed_type_values = ["cuboid", "spherical", "cylinder", "polyhedron"]
+        if values["Type"].lower() not in allowed_type_values:
             raise ValueError(
-                f"Error validating Crystal Type. Allowed values are {allowed_values}, not {v}"
+                f"Error validating Crystal Type. Allowed values are {allowed_type_values}, "
+                f"not {values['Type']}"
             )
-        return v
+
+        if values["Type"].lower() == "polyhedron":
+            wireframe_type = values.get("WireframeType")
+            model_file = values.get("ModelFile")
+            if wireframe_type is None or model_file is None:
+                raise ValueError(
+                    "If crystal Type=polyhedron, WireframeType and ModelFile "
+                    "must be specified. Current values are "
+                    f"WireframeType={wireframe_type} and ModelFile={model_file}"
+                )
+
+        return values
 
     @validator("ContainerMaterialType", each_item=True)
     def validate_ContainerMaterialType(cls, v: str) -> str:

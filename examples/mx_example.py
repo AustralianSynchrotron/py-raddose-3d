@@ -28,7 +28,7 @@ beam = Beam(
     Collimation=("Rectangular", 100, 100),
 )
 
-wedge = Wedge(Wedge=(0.0, 90.0), ExposureTime=50.0)
+wedge = Wedge(Wedge=(0.0, 90.0), ExposureTime=50.0, AngularResolution=1.0)
 
 rad_dose_3d = RadDose3D(
     sample_id="my_sample",

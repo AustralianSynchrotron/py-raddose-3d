@@ -1,6 +1,7 @@
+import asyncio
+
 from raddose_3d.raddose3d import RadDose3D
 from raddose_3d.schemas.input import Beam, Crystal, Wedge
-import asyncio
 
 crystal = Crystal(
     Type="Cuboid",
@@ -32,14 +33,16 @@ sample_1 = RadDose3D(
     wedge=wedge,
 )
 
-sample_2= RadDose3D(
+sample_2 = RadDose3D(
     sample_id="sample_2",
     crystal=crystal,
     beam=beam,
     wedge=wedge,
 )
 
+
 async def main():
     await asyncio.gather(sample_1.run_async(), sample_2.run_async())
+
 
 asyncio.run(main())
