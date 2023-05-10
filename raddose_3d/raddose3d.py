@@ -103,7 +103,7 @@ class RadDose3D:
         with open(file_path, "w") as fp:
             for line in yaml_input:
                 if line.lower() != "wedge:":
-                    fp.write(line.replace(":", "").replace("-", "") + "\n")
+                    fp.write(line.replace(":", "").replace("- Wedge", "Wedge") + "\n")
                 else:
                     fp.write("# wedge" + "\n")
 
