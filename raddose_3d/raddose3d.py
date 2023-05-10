@@ -137,11 +137,16 @@ class RadDose3D:
         else:
             stdout_str = str(stdout, encoding="utf-8")
             logging.info(stdout_str)
-            warning_list = ["warning", "angular resolution too big"]
+            warning_list = ["warning", "angular resolution too big", "* warning *"]
 
-            for line in stdout_str.splitlines():
-                if any(word in line.lower() for word in warning_list):
-                    warnings.warn(line, RuntimeWarning)
+            stdout_list = stdout_str.splitlines()
+
+            for i, line in enumerate(stdout_list):
+                if any(warning in line.lower() for warning in warning_list):
+                    if "* warning *" in line.lower():
+                        warnings.warn(stdout_list[i + 1], RuntimeWarning)
+                    else:
+                        warnings.warn(line, RuntimeWarning)
 
             logging.info(f"Results saved to {self.sample_directory}")
 
