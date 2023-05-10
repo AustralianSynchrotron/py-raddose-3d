@@ -26,7 +26,7 @@ class RadDose3D:
         sample_id: str,
         crystal: Crystal,
         beam: Beam,
-        wedge: Wedge,
+        wedge: Wedge | list[Wedge],
         output_directory: str | None = None,
     ) -> None:
         """
@@ -38,8 +38,8 @@ class RadDose3D:
             A Crystal Pydantic model
         beam : Beam
             A Beam pydantic model
-        wedge : Wedge
-            A Wedge pydantic model
+        wedge : Wedge | list[Wedge]
+            A Wedge pydantic model, or a list of Wedges
         output_directory : str | None, optional
             Output directory. If output_directory=None, we use the current working directory,
             by default None.
