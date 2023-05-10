@@ -296,7 +296,7 @@ class Wedge(BaseModel):
 class RadDoseInput(BaseModel):
     crystal: Crystal
     beam: Beam
-    wedge: Wedge
+    wedge: Wedge | list[Wedge]
 
     class Config:
         extra = "forbid"

@@ -102,10 +102,8 @@ class RadDose3D:
         file_path = path.join(self.sample_directory, f"{self.sample_id}.txt")
         with open(file_path, "w") as fp:
             for line in yaml_input:
-                # For some reason, wedge is not included as a header in the raddose-3d,
-                # input file, even though it is defined as a block in raddose-3D
                 if line.lower() != "wedge:":
-                    fp.write(line.replace(":", "") + "\n")
+                    fp.write(line.replace(":", "").replace("-", "") + "\n")
                 else:
                     fp.write("# wedge" + "\n")
 
