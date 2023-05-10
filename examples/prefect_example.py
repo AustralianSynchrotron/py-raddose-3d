@@ -1,17 +1,19 @@
-from prefect import task, flow
 import asyncio
+
+from prefect import flow, task
 
 from raddose_3d.raddose3d import RadDose3D
 from raddose_3d.schemas.input import Beam, Crystal, Wedge
 
+
 @task
 async def run_raddose(sample_id: str) -> RadDose3D:
     crystal = Crystal(
-    Type="Cuboid",
-    Dimensions=(100, 100, 100),
-    AbsCoefCalc="RD3D",
-    UnitCell=(78.02, 78.02, 78.02),
-)
+        Type="Cuboid",
+        Dimensions=(100, 100, 100),
+        AbsCoefCalc="RD3D",
+        UnitCell=(78.02, 78.02, 78.02),
+    )
 
     beam = Beam(
         Type="Gaussian",
@@ -30,6 +32,7 @@ async def run_raddose(sample_id: str) -> RadDose3D:
         wedge=wedge,
     )
     await sample.run_async()
+
 
 @flow
 async def multiple_samples():
