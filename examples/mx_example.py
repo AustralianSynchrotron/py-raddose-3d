@@ -8,33 +8,55 @@ from raddose_3d.raddose3d import RadDose3D
 from raddose_3d.schemas.input import Beam, Crystal, Wedge
 
 crystal = Crystal(
+    GoniometerAxis=90,
     Type="Cuboid",
-    Dimensions=(100, 100, 100),
-    PixelsPerMicron=0.1,
-    AbsCoefCalc="RD3D",
-    UnitCell=(78.02, 78.02, 78.02),
-    NumMonomers=24,
-    NumResidues=51,
-    ProteinHeavyAtoms=("Zn", 0.333, "S", 6),
-    SolventHeavyConc=("P", 425),
-    SolventFraction=0.64,
+    Dimensions=(20, 60, 20),
+    PixelsPerMicron=1.0,
+    AngleL=0,
+    AngleP=0,
+    # --------------------------------------
+    AbsCoefCalc="sequence",
+    SeqFile="examples/2veo.fasta",
+    UnitCell=(91.539, 91.539, 299.842, 90.0, 90.0, 90.0),
+    NumMonomers=10,
+    # ---If not using sequence and experimental data----
+    # ---then change AbsCoefCalc to 'Average'-----------
+    # AbsCoefCalc="Average",
 )
 
 beam = Beam(
     Type="Gaussian",
-    Flux=2e12,
-    FWHM=(20, 70),
-    Energy=12.1,
-    Collimation=("Rectangular", 100, 100),
+    Flux=3e11,
+    FWHM=(10, 10),
+    Energy=13.0,
+    # EnergyFWHM=0.0025,  # Slooooow
+    Collimation=("Circular", 10, 10),
 )
 
-wedge = Wedge(Wedge=(0.0, 90.0), ExposureTime=50.0, AngularResolution=1.0)
+wedge_1 = Wedge(
+    Wedge=(0, 180),
+    ExposureTime=10,
+    AngularResolution=1,
+    StartOffset=(0, -20, 0),
+)
+
+wedge_2 = Wedge(
+    Wedge=(0, 180),
+    ExposureTime=10,
+    AngularResolution=1,
+    StartOffset=(0, -10, 0),
+    RotAxBeamOffset=2.5,
+    TranslatePerDegree=(0, 0.15, 0),
+)
 
 rad_dose_3d = RadDose3D(
     sample_id="my_sample",
     crystal=crystal,
     beam=beam,
-    wedge=wedge,
+    wedge=[
+        wedge_1,
+        wedge_2,
+    ],
 )
 
 summary = rad_dose_3d.run()
