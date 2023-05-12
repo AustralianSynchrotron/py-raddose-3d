@@ -69,7 +69,7 @@ core.*
 scratch.py
 
 # Images
-*.png
+# *.png
 *.jpg
 *.tiff
 
