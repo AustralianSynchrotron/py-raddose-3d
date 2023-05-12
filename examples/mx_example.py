@@ -4,6 +4,8 @@ experiment where a crystal of insulin is exposed to a Gaussian profile X-ray bea
 seconds with a 90 degrees rotation (example taken from the the main RADDOSE-3D repository)
 """
 
+from os import path
+
 from raddose_3d.raddose3d import RadDose3D
 from raddose_3d.schemas.input import Beam, Crystal, Wedge
 
@@ -16,7 +18,7 @@ crystal = Crystal(
     AngleP=0,
     # --------------------------------------
     AbsCoefCalc="sequence",
-    SeqFile="examples/2veo.fasta",
+    SeqFile=path.join(path.dirname(__file__), "2veo.fasta"),
     UnitCell=(91.539, 91.539, 299.842, 90.0, 90.0, 90.0),
     NumMonomers=10,
     # ---If not using sequence and experimental data----

@@ -133,14 +133,14 @@ steps:
       - env | sort
 
   - name: pylint
-    image: python:3.9
+    image: python:3.10
     commands:
       - python -m pip install poetry --user
       - python -m poetry install
       - python -m poetry run pre-commit run --all-files
 
   - name: build
-    image: python:3.9
+    image: python:3.10
     volumes:
       - name: dist
         path: ./dist
@@ -152,7 +152,7 @@ steps:
       - echo Building...
       - python -m poetry build
       - echo Building docs...
-      - python -m poetry install
+      - python -m poetry install --no-dev
 
   - name: publish-package
     image: plugins/pypi

@@ -2,27 +2,8 @@
 name = "raddose-3d"
 version = "0.1.1"
 description = "Python wrapper of RADDOSE-3D"
-authors = ["Francisco Hernandez Vivanco <hernandf@ansto.gov.au>"]
-
-[[tool.poetry.source]]
-name = "cachedpypi"
-url = "https://pypi.asci.synchrotron.org.au/root/pypi/+simple"
-secondary = true
-
-[[tool.poetry.source]]
-name = "asci-dev"
-url = "https://pypi.asci.synchrotron.org.au/asci/dev/+simple"
-secondary = true
-
-[[tool.poetry.source]]
-name = "asciprod"
-url = "https://pypi.asci.synchrotron.org.au/asci/prod/+simple"
-secondary = true
-
-[[tool.poetry.source]]
-name = "mx3dev"
-url = "https://pypi.asci.synchrotron.org.au/mx3/dev/+simple"
-secondary = true
+authors = ["Francisco Hernandez Vivanco <hernandf@ansto.gov.au>",
+           "Daniel Eriksson <daniele@ansto.gov.au>"]
 
 [tool.poetry.dependencies]
 python = ">=3.10,<3.11"
