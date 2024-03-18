@@ -1,3 +1,9 @@
+"""
+This example shows how to run raddose asynchronously.
+We use two samples for this example, but more samples
+can be executed asynchronously
+"""
+
 import asyncio
 
 from raddose_3d.raddose3d import RadDose3D
