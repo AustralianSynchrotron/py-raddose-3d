@@ -1,4 +1,5 @@
-from pydantic import BaseModel, Field, root_validator, validator
+from pydantic import BaseModel, Field, field_validator, model_validator
+from typing_extensions import Self
 
 
 def _convert_tuple_to_str(input: tuple) -> str:
@@ -27,8 +28,8 @@ def _convert_tuple_to_str(input: tuple) -> str:
 
 class Crystal(BaseModel):
     Type: str = Field(example="Cuboid")
-    WireframeType: str | None
-    ModelFile: str | None
+    WireframeType: str | None = None
+    ModelFile: str | None = None
     Dimensions: tuple[int] | tuple[int, int] | tuple[int, int, int] | str = Field(
         description="Dimensions of the crystal in X,Y,Z in micrometers.",
         example=(100, 80, 60),
@@ -36,89 +37,103 @@ class Crystal(BaseModel):
     PixelsPerMicron: float | None = Field(
         description="The computational resolution", example=0.1
     )
-    AngleP: float | None
-    AngleL: float | None
-    ContainerMaterialType: str | None
-    MaterialMixture: str | None
-    MaterialElements: tuple | str | None = Field(example=("Si", 1, "O", 2))
-    ContainerThickness: float | None
-    ContainerDensity: float | None
+    AngleP: float | None = None
+    AngleL: float | None = None
+    ContainerMaterialType: str | None = None
+    MaterialMixture: str | None = None
+    MaterialElements: tuple | str | None = Field(
+        example=("Si", 1, "O", 2), default=None
+    )
+    ContainerThickness: float | None = None
+    ContainerDensity: float | None = None
     AbsCoefCalc: str | None = Field(
         description="Tells RADDOSE-3D how to calculate the absorption coefficients",
         example="RD3D",
+        default=None,
     )
     Pdb: str | None = Field(
-        description="Use a PDB for the crystal composition", example="1KMT"
+        description="Use a PDB for the crystal composition",
+        example="1KMT",
+        default=None,
     )
-    SeqFile: str | None
-    CIF: str | None
+    SeqFile: str | None = None
+    CIF: str | None = None
     UnitCell: tuple[float, float, float] | tuple[
         float, float, float, float, float, float
     ] | str | None = Field(
         description="Unit cell size: a, b, c, or a, b, c, alpha, beta, gamma",
         example=(78.4, 78.4, 78.4),
+        default=None,
     )
     NumMonomers: int | None = Field(
-        description="number of monomers in unit cell", example=8
+        description="number of monomers in unit cell", example=8, default=None
     )
     NumResidues: int | None = Field(
-        descprition="number of residues per monomer", example=153
+        descprition="number of residues per monomer", example=153, default=None
     )
-    NumRNA: int | None
-    NumDNA: int | None
-    NumCarb: int | None
+    NumRNA: int | None = None
+    NumDNA: int | None = None
+    NumCarb: int | None = None
     ProteinHeavyAtoms: tuple | str | None = Field(
         description="Heavy atoms added to protein part of the "
         "monomer, i.e. S, coordinated metals, Se in Se-Met"
         "Note: If a sequence file is used, S does not need to be added",
         example=("Zn", 2, "S", 6),
+        default=None,
     )
     SolventHeavyConc: tuple | str | None = Field(
         description="Concentration of elements in the solvent in mmol/l. "
         "Oxygen and lighter elements should not be specified",
         example=("P", 425),
+        default=None,
     )
     SolventFraction: float | None = Field(
-        description="Fraction of the unit cell occupied by solvent", example=0.6436
+        description="Fraction of the unit cell occupied by solvent",
+        example=0.6436,
+        default=None,
     )
-    ProteinConc: float | None
-    SmallMoleAtoms: tuple | None = Field(example=("C", 18, "H", 15, "Bi", 8))
-    CalculatePEescape: bool | None
-    CalculateFLEscape: bool | None
-    CalcSurrounding: bool | None
-    SurroundingHeavyConc: tuple | str | None = Field(example=("Na", 1000, "Cl", 1000))
-    GoniometerAxis: int | None
-    PolarisationDirection: int | None
-    DensityBased: bool | None
-    SurroundingElements: tuple | str | None = Field(example=("C", 3, "H", 8))
-    SurroundingDensity: float | None
-    Subprogram: str | None
-    Runs: int | None
-    SimPhotons: int | None
-    SurroundingThickness: tuple[float, float, float] | str | None
+    ProteinConc: float | None = None
+    SmallMoleAtoms: tuple | None = Field(
+        example=("C", 18, "H", 15, "Bi", 8), default=None
+    )
+    CalculatePEescape: bool | None = None
+    CalculateFLEscape: bool | None = None
+    CalcSurrounding: bool | None = None
+    SurroundingHeavyConc: tuple | str | None = Field(
+        example=("Na", 1000, "Cl", 1000), default=None
+    )
+    GoniometerAxis: int | None = None
+    PolarisationDirection: int | None = None
+    DensityBased: bool | None = None
+    SurroundingElements: tuple | str | None = Field(
+        example=("C", 3, "H", 8), default=None
+    )
+    SurroundingDensity: float | None = None
+    Subprogram: str | None = None
+    Runs: int | None = None
+    SimPhotons: int | None = None
+    SurroundingThickness: tuple[float, float, float] | str | None = None
 
-    @root_validator(pre=True)
-    def validate_type(cls, values: dict) -> dict:
+    @model_validator(mode="after")
+    def validate_type(self) -> Self:
         allowed_type_values = ["cuboid", "spherical", "cylinder", "polyhedron"]
-        if values["Type"].lower() not in allowed_type_values:
+        if self.Type.lower() not in allowed_type_values:
             raise ValueError(
                 f"Error validating Crystal Type. Allowed values are {allowed_type_values}, "
-                f"not {values['Type']}"
+                f"not {self.Type}"
             )
 
-        if values["Type"].lower() == "polyhedron":
-            wireframe_type = values.get("WireframeType")
-            model_file = values.get("ModelFile")
-            if wireframe_type is None or model_file is None:
+        if self.Type.lower() == "polyhedron":
+            if self.WireframeType is None or self.ModelFile is None:
                 raise ValueError(
                     "If crystal Type=polyhedron, WireframeType and ModelFile "
                     "must be specified. Current values are "
-                    f"WireframeType={wireframe_type} and ModelFile={model_file}"
+                    f"WireframeType={self.WireframeType} and "
+                    f"ModelFile={self.ModelFile}"
                 )
+        return self
 
-        return values
-
-    @validator("ContainerMaterialType", each_item=True)
+    @field_validator("ContainerMaterialType")
     def validate_ContainerMaterialType(cls, v: str) -> str:
         allowed_values = ["none", "mixture", "elemental"]
         if v.lower() not in allowed_values:
@@ -128,7 +143,7 @@ class Crystal(BaseModel):
             )
         return v
 
-    @validator("AbsCoefCalc", each_item=True)
+    @field_validator("AbsCoefCalc")
     def validate_AbsCoefCalc(cls, v: str) -> str:
         allowed_values = [
             "average",
@@ -150,7 +165,7 @@ class Crystal(BaseModel):
             )
         return v
 
-    @validator("Subprogram", each_item=True)
+    @field_validator("Subprogram")
     def validate_Subprogram(cls, v: str) -> str:
         allowed_values = ["xfel", "montecarlo"]
         if v.lower() not in allowed_values:
@@ -159,35 +174,35 @@ class Crystal(BaseModel):
             )
         return v
 
-    @validator("Dimensions", each_item=True)
+    @field_validator("Dimensions")
     def convert_dimensions_to_str(cls, v):
         return _convert_tuple_to_str(v)
 
-    @validator("ProteinHeavyAtoms", each_item=True)
+    @field_validator("ProteinHeavyAtoms")
     def convert_ProteinHeavyAtoms_to_str(cls, v):
         return _convert_tuple_to_str(v)
 
-    @validator("SolventHeavyConc", each_item=True)
+    @field_validator("SolventHeavyConc")
     def convert_SolventHeavyConc_to_str(cls, v):
         return _convert_tuple_to_str(v)
 
-    @validator("UnitCell", each_item=True)
+    @field_validator("UnitCell")
     def convert_UnitCell_to_str(cls, v):
         return _convert_tuple_to_str(v)
 
-    @validator("SmallMoleAtoms", each_item=True)
+    @field_validator("SmallMoleAtoms")
     def convert_SmallMoleAtoms_to_str(cls, v):
         return _convert_tuple_to_str(v)
 
-    @validator("MaterialElements", each_item=True)
+    @field_validator("MaterialElements")
     def convert_MaterialElements_to_str(cls, v):
         return _convert_tuple_to_str(v)
 
-    @validator("SurroundingHeavyConc", each_item=True)
+    @field_validator("SurroundingHeavyConc")
     def convert_SurroundingHeavyConc_to_str(cls, v):
         return _convert_tuple_to_str(v)
 
-    @validator("GoniometerAxis", each_item=True)
+    @field_validator("GoniometerAxis")
     def validate_GoniometerAxis(cls, v):
         allowed_values = [0, 90]
         if v not in allowed_values:
@@ -196,7 +211,7 @@ class Crystal(BaseModel):
             )
         return v
 
-    @validator("PolarisationDirection", each_item=True)
+    @field_validator("PolarisationDirection")
     def validate_PolarisationDirection(cls, v):
         allowed_values = [0, 90]
         if v not in allowed_values:
@@ -205,11 +220,11 @@ class Crystal(BaseModel):
             )
         return v
 
-    @validator("SurroundingElements", each_item=True)
+    @field_validator("SurroundingElements")
     def convert_SurroundingElements_to_str(cls, v):
         return _convert_tuple_to_str(v)
 
-    @validator("SurroundingThickness", each_item=True)
+    @field_validator("SurroundingThickness")
     def convert_SurroundingThickness_to_str(cls, v):
         return _convert_tuple_to_str(v)
 
@@ -225,24 +240,30 @@ class Beam(BaseModel):
         "X=vertical and Y = horizontal for a horizontal goniometer, opposite for a "
         "vertical goniometer",
         example=(10, 10),
+        default=None,
     )
     Energy: float = Field(description="Energy in units of keV", example=12.1)
-    EnergyFWHM: float | None
+    EnergyFWHM: float | None = None
     File: str | None = Field(
-        description="Tell RADDOSE-3D the name of the file", example="beam.pgm"
+        description="Tell RADDOSE-3D the name of the file",
+        example="beam.pgm",
+        default=None,
     )
     PixelSize: tuple[float, float] | str | None = Field(
-        description="Specify the pixel size in microns", example=(0.3027, 0.2995)
+        description="Specify the pixel size in microns",
+        example=(0.3027, 0.2995),
+        default=None,
     )
     Collimation: tuple[str, float, float] | str | None = Field(
         description="X/Y collimation of the beam in micrometers. "
         "X = vertical and Y = horizontal for a horizontal goniometer. "
         "Opposite for a vertical goniometer",
         example=("Circular", 30, 30),
+        default=None,
     )
-    PulseEnergy: float | None
+    PulseEnergy: float | None = None
 
-    @validator("Type", each_item=True)
+    @field_validator("Type")
     def validate_type(cls, v: str) -> str:
         allowed_values = ["tophat", "gaussian", "experimentalpgm"]
         if v.lower() not in allowed_values:
@@ -251,7 +272,7 @@ class Beam(BaseModel):
             )
         return v
 
-    @validator("Collimation", each_item=True)
+    @field_validator("Collimation")
     def convert_collimation_to_str(cls, v: tuple[str, float, float]):
         allowed_values = ["rectangular", "circular"]
         if v[0].lower() not in allowed_values:
@@ -260,11 +281,11 @@ class Beam(BaseModel):
             )
         return _convert_tuple_to_str(v)
 
-    @validator("FWHM", each_item=True)
+    @field_validator("FWHM")
     def convert_FWHM_to_str(cls, v):
         return _convert_tuple_to_str(v)
 
-    @validator("PixelSize", each_item=True)
+    @field_validator("PixelSize")
     def convert_pixel_size_to_str(cls, v):
         return _convert_tuple_to_str(v)
 
@@ -275,20 +296,20 @@ class Beam(BaseModel):
 class Wedge(BaseModel):
     Wedge: tuple[float, float] | str
     ExposureTime: float
-    AngularResolution: float | None
-    StartOffset: tuple[float, float, float] | str | None
-    TranslatePerDegree: tuple[float, float, float] | str | None
-    RotAxBeamOffset: float | None
+    AngularResolution: float | None = None
+    StartOffset: tuple[float, float, float] | str | None = None
+    TranslatePerDegree: tuple[float, float, float] | str | None = None
+    RotAxBeamOffset: float | None = None
 
-    @validator("Wedge", each_item=True)
+    @field_validator("Wedge")
     def convert_Wedge_to_str(cls, v):
         return _convert_tuple_to_str(v)
 
-    @validator("StartOffset", each_item=True)
+    @field_validator("StartOffset")
     def convert_StartOffset_to_str(cls, v):
         return _convert_tuple_to_str(v)
 
-    @validator("TranslatePerDegree", each_item=True)
+    @field_validator("TranslatePerDegree")
     def convert_TranslatePerDegree_to_str(cls, v):
         return _convert_tuple_to_str(v)
 

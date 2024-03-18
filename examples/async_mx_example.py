@@ -42,7 +42,9 @@ sample_2 = RadDose3D(
 
 
 async def main():
-    await asyncio.gather(sample_1.run_async(), sample_2.run_async())
+    async with asyncio.TaskGroup() as tg:
+        tg.create_task(sample_1.run_async())
+        tg.create_task(sample_2.run_async())
 
 
 asyncio.run(main())
