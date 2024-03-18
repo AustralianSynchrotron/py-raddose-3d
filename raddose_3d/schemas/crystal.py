@@ -205,4 +205,3 @@ class Crystal(RadDoseBase):
     @field_validator("SurroundingThickness")
     def convert_SurroundingThickness_to_str(cls, v):
         return convert_tuple_to_str(v)
-

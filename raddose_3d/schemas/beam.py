@@ -1,5 +1,4 @@
 from pydantic import Field, field_validator
-from typing_extensions import Self
 
 from .utils import RadDoseBase, convert_tuple_to_str
 

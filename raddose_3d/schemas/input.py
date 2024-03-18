@@ -1,8 +1,7 @@
-from .utils import RadDoseBase
 from .beam import Beam
 from .crystal import Crystal
+from .utils import RadDoseBase
 from .wedge import Wedge
-
 
 
 class RadDoseInput(RadDoseBase):
