@@ -1,32 +1,10 @@
-from pydantic import BaseModel, Field, field_validator, model_validator
+from pydantic import Field, field_validator, model_validator
 from typing_extensions import Self
 
-
-def _convert_tuple_to_str(input: tuple) -> str:
-    """
-    Converts a tuple to a string format that RADDOSE-3D understands
-
-    Parameters
-    ----------
-    input : tuple
-        A tuple input
-
-    Returns
-    -------
-    str
-        A string representation of the tuple, in a format that
-        RADDOSE-3D understands
-    """
-    if input is not None:
-        characters = ["(", ")", ",", "'"]
-        result = str(input)
-        for char in characters:
-            result = result.replace(char, "")
-        return result
-    return result
+from .utils import RadDoseBase, convert_tuple_to_str
 
 
-class Crystal(BaseModel):
+class Crystal(RadDoseBase):
     Type: str = Field(example="Cuboid")
     WireframeType: str | None = None
     ModelFile: str | None = None
@@ -176,31 +154,31 @@ class Crystal(BaseModel):
 
     @field_validator("Dimensions")
     def convert_dimensions_to_str(cls, v):
-        return _convert_tuple_to_str(v)
+        return convert_tuple_to_str(v)
 
     @field_validator("ProteinHeavyAtoms")
     def convert_ProteinHeavyAtoms_to_str(cls, v):
-        return _convert_tuple_to_str(v)
+        return convert_tuple_to_str(v)
 
     @field_validator("SolventHeavyConc")
     def convert_SolventHeavyConc_to_str(cls, v):
-        return _convert_tuple_to_str(v)
+        return convert_tuple_to_str(v)
 
     @field_validator("UnitCell")
     def convert_UnitCell_to_str(cls, v):
-        return _convert_tuple_to_str(v)
+        return convert_tuple_to_str(v)
 
     @field_validator("SmallMoleAtoms")
     def convert_SmallMoleAtoms_to_str(cls, v):
-        return _convert_tuple_to_str(v)
+        return convert_tuple_to_str(v)
 
     @field_validator("MaterialElements")
     def convert_MaterialElements_to_str(cls, v):
-        return _convert_tuple_to_str(v)
+        return convert_tuple_to_str(v)
 
     @field_validator("SurroundingHeavyConc")
     def convert_SurroundingHeavyConc_to_str(cls, v):
-        return _convert_tuple_to_str(v)
+        return convert_tuple_to_str(v)
 
     @field_validator("GoniometerAxis")
     def validate_GoniometerAxis(cls, v):
@@ -222,17 +200,14 @@ class Crystal(BaseModel):
 
     @field_validator("SurroundingElements")
     def convert_SurroundingElements_to_str(cls, v):
-        return _convert_tuple_to_str(v)
+        return convert_tuple_to_str(v)
 
     @field_validator("SurroundingThickness")
     def convert_SurroundingThickness_to_str(cls, v):
-        return _convert_tuple_to_str(v)
-
-    class Config:
-        extra = "forbid"
+        return convert_tuple_to_str(v)
 
 
-class Beam(BaseModel):
+class Beam(RadDoseBase):
     Type: str = Field(description="Beam type", example="Gaussian")
     Flux: float = Field(description="Flux in units of photons per second", example=2e12)
     FWHM: tuple[float, float] | str | None = Field(
@@ -279,21 +254,18 @@ class Beam(BaseModel):
             raise ValueError(
                 f"Error validating Collimation. Allowed values are {allowed_values}, not {v[0]}"
             )
-        return _convert_tuple_to_str(v)
+        return convert_tuple_to_str(v)
 
     @field_validator("FWHM")
     def convert_FWHM_to_str(cls, v):
-        return _convert_tuple_to_str(v)
+        return convert_tuple_to_str(v)
 
     @field_validator("PixelSize")
     def convert_pixel_size_to_str(cls, v):
-        return _convert_tuple_to_str(v)
-
-    class Config:
-        extra = "forbid"
+        return convert_tuple_to_str(v)
 
 
-class Wedge(BaseModel):
+class Wedge(RadDoseBase):
     Wedge: tuple[float, float] | str
     ExposureTime: float
     AngularResolution: float | None = None
@@ -303,21 +275,18 @@ class Wedge(BaseModel):
 
     @field_validator("Wedge")
     def convert_Wedge_to_str(cls, v):
-        return _convert_tuple_to_str(v)
+        return convert_tuple_to_str(v)
 
     @field_validator("StartOffset")
     def convert_StartOffset_to_str(cls, v):
-        return _convert_tuple_to_str(v)
+        return convert_tuple_to_str(v)
 
     @field_validator("TranslatePerDegree")
     def convert_TranslatePerDegree_to_str(cls, v):
-        return _convert_tuple_to_str(v)
+        return convert_tuple_to_str(v)
 
 
-class RadDoseInput(BaseModel):
+class RadDoseInput(RadDoseBase):
     crystal: Crystal
     beam: Beam
     wedge: Wedge | list[Wedge]
-
-    class Config:
-        extra = "forbid"
