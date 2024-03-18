@@ -7,7 +7,7 @@ from os import getcwd, mkdir, path
 import pandas as pd
 import yaml
 
-from raddose_3d.schemas.input import Beam, Crystal, RadDoseInput, Wedge
+from .schemas.input import Beam, Crystal, RadDoseInput, Wedge
 
 logging.basicConfig(
     level=logging.INFO,

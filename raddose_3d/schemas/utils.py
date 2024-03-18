@@ -1,9 +1,9 @@
 from pydantic import BaseModel
 
+
 class RadDoseBase(BaseModel):
     class Config:
         extra = "forbid"
-
 
 
 def convert_tuple_to_str(input: tuple) -> str:
