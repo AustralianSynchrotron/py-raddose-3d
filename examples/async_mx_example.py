@@ -30,20 +30,30 @@ beam = Beam(
     Collimation=("Rectangular", 100, 100),
 )
 
-wedge = Wedge(Wedge=(0.0, 90.0), ExposureTime=50.0)
+wedge1 = Wedge(
+    Wedge=(0.0, 90.0),
+    ExposureTime=50.0,
+    AngularResolution=1,
+)
+
+wedge2 = Wedge(
+    Wedge=(45.0, 135.0),
+    ExposureTime=30.0,
+    AngularResolution=0.50,
+)
 
 sample_1 = RadDose3D(
     sample_id="sample_1",
     crystal=crystal,
     beam=beam,
-    wedge=wedge,
+    wedge=wedge1,
 )
 
 sample_2 = RadDose3D(
     sample_id="sample_2",
     crystal=crystal,
     beam=beam,
-    wedge=wedge,
+    wedge=wedge2,
 )
 
 
