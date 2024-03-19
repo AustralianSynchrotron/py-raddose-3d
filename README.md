@@ -1,14 +1,23 @@
 # RADDOSE-3D python wrapper
-A python wrapper for the RADDOSE-3D Java application from the Garman Lab at the University of Oxford.
+A python wrapper for the RADDOSE-3D Java application from the [Garman Lab](https://www.bioch.ox.ac.uk/garmangroup) at the University of Oxford.
 
 From their [Github page](https://github.com/GarmanGroup/RADDOSE-3D):
 >RADDOSE-3D allows the macroscopic modelling of an X-ray diffraction experiment for the purpose of better predicting radiation-damage progression. The distribution of dose within the crystal volume is calculated for a number of iterations in small angular steps across one or more data collection wedges, providing a time-resolved picture of the dose state of the crystal. The code is highly modular so that future contributions from the community can be easily integrated into it, in particular to incorporate online methods for determining the shape of macromolecular crystals and better protocols for imaging real experimental X-ray beam profiles.
 
+## Requirements
+Requirements are fulfilled using the [Python Poetry](https://python-poetry.org/) dependency manager.
+```
+$ git clone _link-on-github_
+$ poetry install
+$ poetry run python examples/mx_example.py
+```
+
+
 ## Usage
-See [PDF for command reference and manual](RADDOSE-3D-user-guide.pdf) and [examples/mx_example.py](examples/mx_example.py) for a python script with reasonable settings. In the same folder are scripts for running RADDOSE-3D asynchronously and via Prefect.
+See [PDF for command reference and manual](RADDOSE-3D-user-guide.pdf) and [examples/mx_example.py](examples/mx_example.py) for a python script with reasonable settings. In the same folder are scripts for running RADDOSE-3D asynchronously and via [Prefect](https://www.prefect.io/).
 
 ## Output
-Name-Summary.txt contains a brief description of the analysis and a breakdown of salient stats. The most relevant lines to scan are "Average Dose (95% of total absorbed energy threshold)" and the "Final Dose Histogram". For a full treatment of what the results mean refer to the references, ["An in-depth discussion of the output"](#1) in particular.
+Output files are written to separate directories, one directory per sample_id. Name-Summary.txt contains a brief description of the analysis and a breakdown of salient stats. The most relevant lines to scan are "Average Dose (95% of total absorbed energy threshold)" and the "Final Dose Histogram". For a full treatment of what the results mean refer to the references, ["An in-depth discussion of the output"](#1) in particular.
 
 ### Plotting the output
 The name-DoseState.csv file contains the end result of the analysis with each voxel given a dose count. Plotting this can be helpful to understand the RADDOSE-3D syntax for translating the crystal in the beam, offsetting the rotation axis, or doing helical data collection.

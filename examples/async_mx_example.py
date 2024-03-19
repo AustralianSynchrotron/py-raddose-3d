@@ -1,7 +1,13 @@
+"""
+This example shows how to run raddose asynchronously.
+We use two samples for this example, but more samples
+can be executed asynchronously
+"""
+
 import asyncio
 
-from raddose_3d.raddose3d import RadDose3D
-from raddose_3d.schemas.input import Beam, Crystal, Wedge
+from py_raddose_3d.raddose3d import RadDose3D
+from py_raddose_3d.schemas.input import Beam, Crystal, Wedge
 
 crystal = Crystal(
     Type="Cuboid",
@@ -24,25 +30,37 @@ beam = Beam(
     Collimation=("Rectangular", 100, 100),
 )
 
-wedge = Wedge(Wedge=(0.0, 90.0), ExposureTime=50.0)
+wedge1 = Wedge(
+    Wedge=(0.0, 90.0),
+    ExposureTime=50.0,
+    AngularResolution=1,
+)
+
+wedge2 = Wedge(
+    Wedge=(45.0, 135.0),
+    ExposureTime=30.0,
+    AngularResolution=0.50,
+)
 
 sample_1 = RadDose3D(
     sample_id="sample_1",
     crystal=crystal,
     beam=beam,
-    wedge=wedge,
+    wedge=wedge1,
 )
 
 sample_2 = RadDose3D(
     sample_id="sample_2",
     crystal=crystal,
     beam=beam,
-    wedge=wedge,
+    wedge=wedge2,
 )
 
 
 async def main():
-    await asyncio.gather(sample_1.run_async(), sample_2.run_async())
+    async with asyncio.TaskGroup() as tg:
+        tg.create_task(sample_1.run_async())
+        tg.create_task(sample_2.run_async())
 
 
 asyncio.run(main())

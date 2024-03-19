@@ -7,7 +7,7 @@ from os import getcwd, mkdir, path
 import pandas as pd
 import yaml
 
-from raddose_3d.schemas.input import Beam, Crystal, RadDoseInput, Wedge
+from .schemas.input import Beam, Crystal, RadDoseInput, Wedge
 
 logging.basicConfig(
     level=logging.INFO,
@@ -96,7 +96,7 @@ class RadDose3D:
         """
         rad_dose_input = self._create_pydantic_model()
         yaml_input: list[str] = yaml.dump(
-            rad_dose_input.dict(exclude_none=True), sort_keys=False
+            rad_dose_input.model_dump(exclude_none=True), sort_keys=False
         ).splitlines()
 
         file_path = path.join(self.sample_directory, f"{self.sample_id}.txt")
