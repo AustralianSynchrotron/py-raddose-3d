@@ -6,8 +6,8 @@ seconds with a 90 degrees rotation (example taken from the the main RADDOSE-3D r
 
 from os import path
 
-from raddose_3d.raddose3d import RadDose3D
-from raddose_3d.schemas.input import Beam, Crystal, Wedge
+from py_raddose_3d.raddose3d import RadDose3D
+from py_raddose_3d.schemas.input import Beam, Crystal, Wedge
 
 crystal = Crystal(
     GoniometerAxis=90,
@@ -59,6 +59,7 @@ rad_dose_3d = RadDose3D(
         wedge_1,
         wedge_2,
     ],
+    output_directory=None,  # The output directory can be specified here
 )
 
 summary = rad_dose_3d.run()

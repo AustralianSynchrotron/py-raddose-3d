@@ -6,8 +6,8 @@ can be executed asynchronously
 
 import asyncio
 
-from raddose_3d.raddose3d import RadDose3D
-from raddose_3d.schemas.input import Beam, Crystal, Wedge
+from py_raddose_3d.raddose3d import RadDose3D
+from py_raddose_3d.schemas.input import Beam, Crystal, Wedge
 
 crystal = Crystal(
     Type="Cuboid",
