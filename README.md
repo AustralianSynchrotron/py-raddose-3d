@@ -8,6 +8,7 @@ From their [Github page](https://github.com/GarmanGroup/RADDOSE-3D):
 Requirements are fulfilled using the [Python Poetry](https://python-poetry.org/) dependency manager.
 ```
 $ git clone https://github.com/AustralianSynchrotron/py-raddose-3d.git
+$ cd py-raddose-3d
 $ poetry install
 $ poetry run python examples/mx_example.py
 ```
