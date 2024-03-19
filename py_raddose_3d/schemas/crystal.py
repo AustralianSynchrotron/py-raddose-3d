@@ -1,4 +1,10 @@
-from pydantic import Field, field_validator, model_validator
+from pydantic import (
+    Field,
+    field_validator,
+    model_validator,
+    NonNegativeFloat,
+    NonNegativeInt,
+)
 from typing_extensions import Self
 
 from .utils import RadDoseBase, convert_tuple_to_str
@@ -8,11 +14,16 @@ class Crystal(RadDoseBase):
     Type: str = Field(example="Cuboid")
     WireframeType: str | None = None
     ModelFile: str | None = None
-    Dimensions: tuple[int] | tuple[int, int] | tuple[int, int, int] | str = Field(
+    Dimensions: (
+        tuple[NonNegativeFloat]
+        | tuple[NonNegativeFloat, NonNegativeFloat]
+        | tuple[NonNegativeFloat, NonNegativeFloat, NonNegativeFloat]
+        | str
+    ) = Field(
         description="Dimensions of the crystal in X,Y,Z in micrometers.",
         example=(100, 80, 60),
     )
-    PixelsPerMicron: float | None = Field(
+    PixelsPerMicron: NonNegativeFloat | None = Field(
         description="The computational resolution", example=0.1
     )
     AngleP: float | None = None
@@ -22,8 +33,8 @@ class Crystal(RadDoseBase):
     MaterialElements: tuple | str | None = Field(
         example=("Si", 1, "O", 2), default=None
     )
-    ContainerThickness: float | None = None
-    ContainerDensity: float | None = None
+    ContainerThickness: NonNegativeFloat | None = None
+    ContainerDensity: NonNegativeFloat | None = None
     AbsCoefCalc: str | None = Field(
         description="Tells RADDOSE-3D how to calculate the absorption coefficients",
         example="RD3D",
@@ -36,22 +47,36 @@ class Crystal(RadDoseBase):
     )
     SeqFile: str | None = None
     CIF: str | None = None
-    UnitCell: tuple[float, float, float] | tuple[
-        float, float, float, float, float, float
-    ] | str | None = Field(
+    UnitCell: (
+        tuple[
+            NonNegativeFloat,
+            NonNegativeFloat,
+            NonNegativeFloat,
+        ]
+        | tuple[
+            NonNegativeFloat,
+            NonNegativeFloat,
+            NonNegativeFloat,
+            NonNegativeFloat,
+            NonNegativeFloat,
+            NonNegativeFloat,
+        ]
+        | str
+        | None
+    ) = Field(
         description="Unit cell size: a, b, c, or a, b, c, alpha, beta, gamma",
         example=(78.4, 78.4, 78.4),
         default=None,
     )
-    NumMonomers: int | None = Field(
+    NumMonomers: NonNegativeInt | None = Field(
         description="number of monomers in unit cell", example=8, default=None
     )
-    NumResidues: int | None = Field(
+    NumResidues: NonNegativeInt | None = Field(
         descprition="number of residues per monomer", example=153, default=None
     )
-    NumRNA: int | None = None
-    NumDNA: int | None = None
-    NumCarb: int | None = None
+    NumRNA: NonNegativeInt | None = None
+    NumDNA: NonNegativeInt | None = None
+    NumCarb: NonNegativeInt | None = None
     ProteinHeavyAtoms: tuple | str | None = Field(
         description="Heavy atoms added to protein part of the "
         "monomer, i.e. S, coordinated metals, Se in Se-Met"
@@ -65,12 +90,12 @@ class Crystal(RadDoseBase):
         example=("P", 425),
         default=None,
     )
-    SolventFraction: float | None = Field(
+    SolventFraction: NonNegativeFloat | None = Field(
         description="Fraction of the unit cell occupied by solvent",
         example=0.6436,
         default=None,
     )
-    ProteinConc: float | None = None
+    ProteinConc: NonNegativeFloat | None = None
     SmallMoleAtoms: tuple | None = Field(
         example=("C", 18, "H", 15, "Bi", 8), default=None
     )
@@ -86,11 +111,19 @@ class Crystal(RadDoseBase):
     SurroundingElements: tuple | str | None = Field(
         example=("C", 3, "H", 8), default=None
     )
-    SurroundingDensity: float | None = None
+    SurroundingDensity: NonNegativeFloat | None = None
     Subprogram: str | None = None
     Runs: int | None = None
     SimPhotons: int | None = None
-    SurroundingThickness: tuple[float, float, float] | str | None = None
+    SurroundingThickness: (
+        tuple[
+            NonNegativeFloat,
+            NonNegativeFloat,
+            NonNegativeFloat,
+        ]
+        | str
+        | None
+    ) = None
 
     @model_validator(mode="after")
     def validate_type(self) -> Self:

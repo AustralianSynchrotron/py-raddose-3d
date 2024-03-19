@@ -1,12 +1,12 @@
-from pydantic import field_validator
+from pydantic import field_validator, NonNegativeFloat
 
 from .utils import RadDoseBase, convert_tuple_to_str
 
 
 class Wedge(RadDoseBase):
-    Wedge: tuple[float, float] | str
-    ExposureTime: float
-    AngularResolution: float | None = None
+    Wedge: tuple[NonNegativeFloat, NonNegativeFloat] | str
+    ExposureTime: NonNegativeFloat
+    AngularResolution: NonNegativeFloat | None = None
     StartOffset: tuple[float, float, float] | str | None = None
     TranslatePerDegree: tuple[float, float, float] | str | None = None
     RotAxBeamOffset: float | None = None

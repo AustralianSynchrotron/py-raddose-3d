@@ -1,38 +1,40 @@
-from pydantic import Field, field_validator
+from pydantic import Field, field_validator, NonNegativeFloat
 
 from .utils import RadDoseBase, convert_tuple_to_str
 
 
 class Beam(RadDoseBase):
     Type: str = Field(description="Beam type", example="Gaussian")
-    Flux: float = Field(description="Flux in units of photons per second", example=2e12)
-    FWHM: tuple[float, float] | str | None = Field(
+    Flux: NonNegativeFloat = Field(
+        description="Flux in units of photons per second", example=2e12
+    )
+    FWHM: tuple[NonNegativeFloat, NonNegativeFloat] | str | None = Field(
         description="Full Width Half Maximum in micrometers, X and Y for a Gaussian beam. "
         "X=vertical and Y = horizontal for a horizontal goniometer, opposite for a "
         "vertical goniometer",
         example=(10, 10),
         default=None,
     )
-    Energy: float = Field(description="Energy in units of keV", example=12.1)
-    EnergyFWHM: float | None = None
+    Energy: NonNegativeFloat = Field(description="Energy in units of keV", example=12.1)
+    EnergyFWHM: NonNegativeFloat | None = None
     File: str | None = Field(
         description="Tell RADDOSE-3D the name of the file",
         example="beam.pgm",
         default=None,
     )
-    PixelSize: tuple[float, float] | str | None = Field(
+    PixelSize: tuple[NonNegativeFloat, NonNegativeFloat] | str | None = Field(
         description="Specify the pixel size in microns",
         example=(0.3027, 0.2995),
         default=None,
     )
-    Collimation: tuple[str, float, float] | str | None = Field(
+    Collimation: tuple[str, NonNegativeFloat, NonNegativeFloat] | str | None = Field(
         description="X/Y collimation of the beam in micrometers. "
         "X = vertical and Y = horizontal for a horizontal goniometer. "
         "Opposite for a vertical goniometer",
         example=("Circular", 30, 30),
         default=None,
     )
-    PulseEnergy: float | None = None
+    PulseEnergy: NonNegativeFloat | None = None
 
     @field_validator("Type")
     def validate_type(cls, v: str) -> str:
@@ -44,7 +46,9 @@ class Beam(RadDoseBase):
         return v
 
     @field_validator("Collimation")
-    def convert_collimation_to_str(cls, v: tuple[str, float, float]):
+    def convert_collimation_to_str(
+        cls, v: tuple[str, NonNegativeFloat, NonNegativeFloat]
+    ):
         allowed_values = ["rectangular", "circular"]
         if v[0].lower() not in allowed_values:
             raise ValueError(
