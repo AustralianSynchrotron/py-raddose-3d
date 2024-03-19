@@ -59,7 +59,9 @@ rad_dose_3d = RadDose3D(
         wedge_1,
         wedge_2,
     ],
-    output_directory=None,  # The output directory can be specified here
+    # The output directory can be specified here or left as none.
+    # If specified, it needs to exist already.
+    output_directory=None,
 )
 
 summary = rad_dose_3d.run()

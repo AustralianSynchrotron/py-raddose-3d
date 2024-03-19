@@ -17,7 +17,7 @@ $ poetry run python examples/mx_example.py
 See [PDF for command reference and manual](RADDOSE-3D-user-guide.pdf) and [examples/mx_example.py](examples/mx_example.py) for a python script with reasonable settings. In the same folder are scripts for running RADDOSE-3D asynchronously and via [Prefect](https://www.prefect.io/).
 
 ## Output
-Name-Summary.txt contains a brief description of the analysis and a breakdown of salient stats. The most relevant lines to scan are "Average Dose (95% of total absorbed energy threshold)" and the "Final Dose Histogram". For a full treatment of what the results mean refer to the references, ["An in-depth discussion of the output"](#1) in particular.
+Output files are written to separate directories, one directory per sample_id. Name-Summary.txt contains a brief description of the analysis and a breakdown of salient stats. The most relevant lines to scan are "Average Dose (95% of total absorbed energy threshold)" and the "Final Dose Histogram". For a full treatment of what the results mean refer to the references, ["An in-depth discussion of the output"](#1) in particular.
 
 ### Plotting the output
 The name-DoseState.csv file contains the end result of the analysis with each voxel given a dose count. Plotting this can be helpful to understand the RADDOSE-3D syntax for translating the crystal in the beam, offsetting the rotation axis, or doing helical data collection.
