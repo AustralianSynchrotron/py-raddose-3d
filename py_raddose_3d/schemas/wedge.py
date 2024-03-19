@@ -1,4 +1,4 @@
-from pydantic import field_validator, NonNegativeFloat
+from pydantic import NonNegativeFloat, field_validator
 
 from .utils import RadDoseBase, convert_tuple_to_str
 

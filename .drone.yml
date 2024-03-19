@@ -12,14 +12,14 @@ steps:
       - env | sort
 
   - name: pylint
-    image: python:3.10
+    image: python:3.11
     commands:
       - python -m pip install poetry --user
       - python -m poetry install
       - python -m poetry run pre-commit run -a
 
   - name: build
-    image: python:3.10
+    image: python:3.11
     volumes:
       - name: dist
         path: ./dist
@@ -133,14 +133,14 @@ steps:
       - env | sort
 
   - name: pylint
-    image: python:3.10
+    image: python:3.11
     commands:
       - python -m pip install poetry --user
       - python -m poetry install
       - python -m poetry run pre-commit run --all-files
 
   - name: build
-    image: python:3.10
+    image: python:3.11
     volumes:
       - name: dist
         path: ./dist

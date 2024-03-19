@@ -1,9 +1,9 @@
 from pydantic import (
     Field,
-    field_validator,
-    model_validator,
     NonNegativeFloat,
     NonNegativeInt,
+    field_validator,
+    model_validator,
 )
 from typing_extensions import Self
 
